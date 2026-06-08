@@ -1,112 +1,186 @@
-# Aplicativo Interactivo de Logica y Algoritmos
+# LogicWeb UTA — Python Edition
 
 **Asignatura:** Algoritmos y Logica de Programacion  
 **Universidad:** Universidad Tecnica de Ambato  
-**Docente:** Jose Caiza  
 **Grupo:** A — Balarezo Diego, Bravo Samuel, Cajiao Paulo, Loor Jhon, Pomaquero Katherine  
+**Repositorio:** [https://github.com/TurKellou/ProyectoProgramacionGrupoA.git](https://github.com/TurKellou/ProyectoProgramacionGrupoA.git)
 
 ---
 
 ## Descripcion General
 
-Este repositorio contiene el proyecto final de la asignatura Algoritmos y Logica de Programacion. Se trata de un aplicativo web interactivo orientado a la ensenanza y evaluacion de conceptos fundamentales de programacion, desarrollado con Django como framework principal e integrado con implementaciones en C++ y Python que sirven como base pedagogica del sistema.
+LogicWeb UTA es una plataforma web didactica para el aprendizaje de Algoritmos y Logica de Programacion. Permite a los estudiantes revisar teoria organizada por unidades, analizar ejercicios resueltos paso a paso e interactuar con un laboratorio de practicas que evalua el razonamiento algoritmico mediante retroalimentacion automatica e inmediata.
 
-El aplicativo permite a los estudiantes interactuar con ejercicios de logica, ingresar respuestas, recibir retroalimentacion automatica y llevar un seguimiento de su progreso academico.
-
----
-
-## Objetivos
-
-**General**
-
-Desarrollar un sistema de gestion academica integral que permita la administracion de informacion estudiantil y temas curriculares, garantizando la integridad de los datos mediante el uso de estructuras de control y persistencia en archivos externos.
-
-**Especificos**
-
-- Implementar estructuras de datos (arreglos y structs) para organizar eficientemente las notas de los estudiantes y las descripciones tecnicas de los temas de programacion vistos en clase.
-- Disenar un menu interactivo que facilite la navegacion del usuario entre las funciones de ingreso, visualizacion y almacenamiento, aplicando logica de control de flujo.
-- Gestionar la persistencia de datos mediante flujos de salida (`ofstream` en C++, `open()` en Python), permitiendo el registro historico de actividades y promedios en un archivo de texto plano.
+Esta version esta desarrollada en Python con el framework Flask, SQLite como motor de base de datos y Jinja2 como sistema de plantillas. Es funcionalmente equivalente a la version original en PHP y MySQL, adaptada a un entorno Python puro sin dependencias externas mas alla de Flask.
 
 ---
 
-## Funcionalidades del Aplicativo Web
+## Funcionalidades
 
-- Registro e inicio de sesion de estudiantes.
-- Visualizacion de ejercicios clasificados por tema y nivel de dificultad.
-- Evaluacion automatica de respuestas numericas (con tolerancia de 0.01) y textuales.
-- Visualizacion del codigo educativo en C++ y Python con resaltado de sintaxis.
-- Exportacion del historial de intentos en formato CSV.
-- Retroalimentacion detallada por ejercicio.
-- Seguimiento del progreso por estudiante.
+**Modulo de Teoria — Unidades**
+
+Presenta los temas de la asignatura agrupados por unidad. Cada tema incluye una vista de detalle con contenido HTML enriquecido (definiciones, ejemplos en pseudocodigo y bloques de codigo). Los temas se consultan directamente desde la base de datos y se renderizan via Jinja2.
+
+**Modulo de Ejercicios Resueltos**
+
+Lista los ejercicios clasificados por categoria y nivel de dificultad (Basica, Intermedia, Avanzada). La vista de detalle muestra el enunciado, el analisis IPO (Entrada / Proceso / Salida) y la solucion propuesta con bloques de codigo resaltados.
+
+**Modulo de Practicas — Laboratorio Interactivo**
+
+Cada ejercicio disponible ofrece dos modalidades de practica independientes:
+
+- **Practica con Datos:** El estudiante ingresa valores numericos al formulario, formula una respuesta segun su propio algoritmo y el servidor la evalua via AJAX. La retroalimentacion incluye el valor real calculado, la respuesta del estudiante y una recomendacion pedagogica. La evaluacion se realiza con tolerancia de 0.01 para respuestas numericas y comparacion sin distincion de mayusculas para respuestas textuales.
+
+- **Desafio de Pseudocodigo:** El estudiante recibe las lineas del algoritmo en orden aleatorio (generado con `random.shuffle`) y debe reordenarlas mediante arrastre (drag & drop con SortableJS) hasta reconstruir la secuencia logica correcta. La validacion se realiza via AJAX comparando la cadena de lineas ordenadas separadas por `|` contra el orden correcto almacenado en la aplicacion.
+
+En ambas modalidades, la retroalimentacion se muestra mediante alertas visuales con SweetAlert2. Los intentos se registran en la tabla `Intento` de la base de datos unicamente si el usuario tiene sesion activa.
+
+**Modulo de Usuarios**
+
+- Registro de cuenta con nombre, correo electronico y contrasena. Las contrasenas se almacenan con hash generado por `werkzeug.security.generate_password_hash`.
+- Inicio de sesion autenticado verificado con `werkzeug.security.check_password_hash`. La sesion se gestiona con `flask.session`.
+- Cierre de sesion mediante `session.clear()`.
+- Historial de intentos accesible para usuarios autenticados, con listado ordenado por fecha descendente que incluye ejercicio, categoria, respuesta enviada y resultado.
 
 ---
 
 ## Stack Tecnologico
 
-| Componente | Version | Funcion Principal |
+| Componente | Version | Funcion |
 |---|---|---|
-| Django | 6.0.4 | Framework principal, arquitectura backend y gestion de rutas |
-| Python | 3.x (CPython 3.14) | Lenguaje base del backend y logica de evaluacion |
-| SQLite3 | Incluida en Django | Motor de base de datos relacional para entorno de desarrollo |
-| HTML5 / CSS3 | Estandar | Estructura semantica y diseno visual de las interfaces |
-| JavaScript | ES6+ | Interactividad en el cliente y manipulacion del DOM |
-| Highlight.js | 11.9.0 (CDN) | Resaltado de sintaxis de C++ y Python en el navegador |
-| Django Template Language | Incluida | Motor de plantillas para renderizado dinamico desde el servidor |
-| CSV (modulo Python) | Libreria Estandar | Exportacion del historial de intentos |
+| Python | 3.10+ | Lenguaje base del backend |
+| Flask | 3.x | Framework web: rutas, sesiones, plantillas y servidor de desarrollo |
+| SQLite3 | Libreria estandar | Motor de base de datos relacional embebido |
+| Werkzeug | Incluida en Flask | Hash y verificacion de contrasenas (`pbkdf2:sha256`) |
+| Jinja2 | Incluida en Flask | Motor de plantillas para renderizado dinamico del HTML |
+| Bootstrap | 5.3.0 (CDN) | Framework CSS para el diseno responsivo de la interfaz |
+| Bootstrap Icons | 1.11.1 (CDN) | Iconografia de la interfaz |
+| SweetAlert2 | 11 (CDN) | Alertas visuales para retroalimentacion de ejercicios |
+| SortableJS | 1.15.0 (CDN) | Drag & drop interactivo en el desafio de pseudocodigo |
+| JavaScript | ES6+ (nativo) | Comunicacion AJAX con el servidor via Fetch API |
 
 ---
 
-## Estructura de la Base de Datos
+## Estructura del Proyecto
 
-| Modelo | Relacion | Modelo Relacionado | Tipo | Descripcion |
-|---|---|---|---|---|
-| Ejercicio | Pertenece a | Tema | ForeignKey (N:1) | Varios ejercicios pueden estar categorizados bajo un mismo tema academico |
-| Intento | Registrado por | Usuario | ForeignKey (N:1) | Un estudiante puede realizar multiples intentos para resolver un ejercicio |
-| Intento | Corresponde a | Ejercicio | ForeignKey (N:1) | Cada intento esta vinculado a un ejercicio especifico del sistema |
-| Retroalimentacion | Uno a uno con | Ejercicio | OneToOneField (1:1) | Cada ejercicio tiene una unica guia de solucion o feedback detallado |
-| ProgresoEstudiante | Calculado para | Usuario | ForeignKey (N:1) | Almacena el historial de metricas y avance para cada usuario |
-
----
-
-## Temas Curriculares Abordados
-
-Los ejercicios del aplicativo cubren los siguientes contenidos de la asignatura:
-
-- Variables y tipos de datos
-- Condicionales (`if/else`, `switch`)
-- Ciclos (`for`, `do-while`, `while`)
-- Arreglos unidimensionales y estructuras (`struct`)
-- Acumuladores y contadores
-- Menus interactivos
-- Persistencia en archivos
-- Validaciones de entrada
-- Organizacion modular del codigo
+```
+logicweb/
+├── app.py                          # Aplicacion principal: configuracion, DB y todas las rutas
+├── requirements.txt                # Dependencias Python del proyecto
+├── instance/
+│   └── logicweb.db                 # Base de datos SQLite (generada automaticamente)
+└── templates/
+    ├── base.html                   # Plantilla base: navbar, estilos globales, footer
+    ├── index.html                  # Pagina principal / landing
+    ├── login.html                  # Formulario de inicio de sesion
+    ├── registro.html               # Formulario de creacion de cuenta
+    ├── historial.html              # Historial de intentos del usuario autenticado
+    ├── teoria_index.html           # Listado de unidades tematicas
+    ├── teoria_detalle.html         # Vista completa de un tema
+    ├── resueltos_index.html        # Listado de ejercicios resueltos
+    ├── resueltos_detalle.html      # Solucion paso a paso de un ejercicio
+    ├── ejercicios_index.html       # Laboratorio: listado de practicas disponibles
+    ├── practica.html               # Interfaz de practica con datos y evaluacion AJAX
+    └── pseudocodigo.html           # Interfaz de ordenamiento de pseudocodigo drag & drop
+```
 
 ---
 
-## Implementacion en C++ y Python
+## Rutas de la Aplicacion
 
-El nucleo logico del sistema — un gestor de notas academicas — fue desarrollado en C++ y replicado en Python como ejercicio comparativo. Ambas implementaciones comparten la misma arquitectura de 15 partes documentadas, que incluyen:
-
-1. Definicion de estructuras de datos (`struct Tema` / `class Tema`)
-2. Declaracion de variables y arreglos
-3. Menu interactivo mediante ciclo `do-while` / `while True`
-4. Ingreso de notas con ciclo `for`
-5. Calculo de promedio y uso de bandera booleana (`notasIngresadas`)
-6. Reporte en pantalla con validacion de estado
-7. Visualizacion de temas teoricos mediante recorrido de arreglos
-8. Exportacion de datos al archivo `resultados.txt` en modo `append`
-9. Validacion de entradas no validas
+| Metodo | Ruta | Funcion | Descripcion |
+|---|---|---|---|
+| GET | `/` | `index` | Pagina principal |
+| GET / POST | `/login` | `login` | Autenticacion de usuarios |
+| GET / POST | `/registro` | `registro` | Creacion de cuenta nueva |
+| GET | `/logout` | `logout` | Cierre de sesion |
+| GET | `/historial` | `historial` | Historial de intentos (requiere sesion) |
+| GET | `/teoria` | `teoria_index` | Listado de temas por unidad |
+| GET | `/teoria/<id>` | `teoria_detalle` | Detalle de un tema especifico |
+| GET | `/resueltos` | `resueltos_index` | Listado de ejercicios resueltos |
+| GET | `/resueltos/<id>` | `resueltos_detalle` | Solucion de un ejercicio |
+| GET | `/ejercicios` | `ejercicios_index` | Laboratorio de practicas |
+| GET | `/ejercicios/practica/<id>` | `practica` | Formulario de practica con datos |
+| POST | `/ejercicios/procesar` | `procesar` | Evaluacion serverside (devuelve JSON) |
+| GET | `/ejercicios/pseudocodigo/<id>` | `pseudocodigo` | Interfaz de pseudocodigo con lineas aleatorias |
+| POST | `/ejercicios/procesar_pseudocodigo` | `procesar_pseudocodigo` | Validacion de orden (devuelve JSON) |
 
 ---
 
-## Instrucciones de Instalacion
+## Base de Datos
 
-### Requisitos previos
+La base de datos SQLite se crea e inicializa automaticamente al arrancar la aplicacion mediante la funcion `init_db()`. Si las tablas no existen, se crean; si la tabla `Tema` esta vacia, se insertan los datos iniciales.
+
+**Esquema**
+
+```sql
+CREATE TABLE Usuario (
+    IdUsuario   INTEGER PRIMARY KEY AUTOINCREMENT,
+    Nombre      TEXT NOT NULL,
+    Correo      TEXT NOT NULL UNIQUE,
+    Contrasena  TEXT NOT NULL,              -- Hash pbkdf2:sha256 via Werkzeug
+    Rol         TEXT DEFAULT 'Estudiante'
+);
+
+CREATE TABLE Tema (
+    IdTema      INTEGER PRIMARY KEY AUTOINCREMENT,
+    Unidad      TEXT NOT NULL,
+    NombreTema  TEXT NOT NULL,
+    Descripcion TEXT NOT NULL               -- Contenido HTML enriquecido
+);
+
+CREATE TABLE Ejercicio (
+    IdEjercicio        INTEGER PRIMARY KEY AUTOINCREMENT,
+    IdTema             INTEGER NOT NULL REFERENCES Tema(IdTema),
+    Titulo             TEXT NOT NULL,
+    Enunciado          TEXT NOT NULL,
+    Categoria          TEXT NOT NULL,
+    Dificultad         TEXT NOT NULL,
+    SolucionEsperada   TEXT,               -- HTML con solucion paso a paso
+    LineasPseudocodigo TEXT                -- Lineas separadas por '|'
+);
+
+CREATE TABLE Intento (
+    IdIntento        INTEGER PRIMARY KEY AUTOINCREMENT,
+    IdUsuario        INTEGER NOT NULL REFERENCES Usuario(IdUsuario),
+    IdEjercicio      INTEGER NOT NULL REFERENCES Ejercicio(IdEjercicio),
+    RespuestaUsuario TEXT,
+    Resultado        INTEGER NOT NULL,     -- 1 = correcto, 0 = incorrecto
+    FechaIntento     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Datos iniciales cargados automaticamente**
+
+| Tabla | Registros |
+|---|---|
+| Tema | 4 (Unidades 1 a 4: Variables, Condicionales, Ciclos, Arreglos) |
+| Ejercicio | 2 (Calculo de Promedio, Calculo de Sueldo con Horas Extras) |
+
+---
+
+## Logica de Evaluacion
+
+**Ejercicio 1 — Calculo de Promedio y Estado**
+
+El servidor recibe tres notas numericas, calcula `(n1 + n2 + n3) / 3` y determina el estado: `Aprobado` si el promedio es mayor o igual a 7, `Reprobado` en caso contrario. La comparacion con la respuesta del usuario ignora diferencias de mayusculas (`str.lower()`).
+
+**Ejercicio 2 — Calculo de Sueldo con Horas Extras**
+
+El servidor recibe las horas trabajadas y la tarifa por hora. Si las horas son menores o iguales a 40, el sueldo es `horas * tarifa`. Si superan 40, el sueldo es `(40 * tarifa) + (horas_extra * tarifa * 2)`, donde `horas_extra = horas - 40`. La comparacion es numerica con tolerancia de 0.01.
+
+**Desafio de Pseudocodigo**
+
+El servidor compara la cadena de lineas ordenadas por el usuario (separadas por `|`) contra el orden correcto definido en el diccionario `ordenes_correctos` dentro de `procesar_pseudocodigo`. La comparacion es exacta mediante igualdad de cadenas (`==`).
+
+---
+
+## Instalacion y Ejecucion
+
+### Requisitos
 
 - Python 3.10 o superior
 - pip
-- Git
 
 ### Pasos
 
@@ -123,36 +197,27 @@ venv\Scripts\activate           # Windows
 # 3. Instalar dependencias
 pip install -r requirements.txt
 
-# 4. Aplicar migraciones
-python manage.py migrate
-
-# 5. Ejecutar el servidor de desarrollo
-python manage.py runserver
+# 4. Ejecutar el servidor de desarrollo
+python app.py
 ```
 
-El aplicativo estara disponible en `http://127.0.0.1:8000/`.
+El aplicativo estara disponible en `http://127.0.0.1:5000`. La base de datos se crea y puebla automaticamente en `instance/logicweb.db` al primer inicio; no se requiere ninguna configuracion adicional.
 
 ---
 
-## Compilacion del Codigo C++
+## Diferencias respecto a la Version Original en PHP
 
-```bash
-g++ -o sistema main.cpp
-./sistema
-```
-
----
-
-## Repositorio
-
-[https://github.com/TurKellou/ProyectoProgramacionGrupoA.git](https://github.com/TurKellou/ProyectoProgramacionGrupoA.git)
-
----
-
-## Conclusiones
-
-El proyecto demuestra la aplicacion practica de los conceptos fundamentales de la asignatura en un entorno de desarrollo real. La implementacion de arreglos y estructuras permitio organizar eficientemente los datos; el diseno del menu interactivo con validaciones garantizo la robustez de la interfaz; y la gestion de la persistencia en archivos aseguro que la informacion academica trascienda la memoria volatil del sistema, sentando las bases para la construccion de aplicaciones escalables.
+| Aspecto | Version PHP | Version Python |
+|---|---|---|
+| Lenguaje backend | PHP 8.x | Python 3.10+ con Flask 3.x |
+| Base de datos | MySQL via PDO | SQLite3 via libreria estandar |
+| Plantillas | PHP mezclado con HTML | Jinja2 separado del codigo |
+| Sesiones | `$_SESSION` nativo de PHP | `flask.session` con cookie firmada |
+| Hash de contrasenas | `password_hash` / `password_verify` (bcrypt) | `werkzeug.security` (pbkdf2:sha256) |
+| Estructura de archivos | Un archivo `.php` por vista | Un `app.py` central + carpeta `templates/` |
+| Inicializacion de DB | Script SQL externo o phpMyAdmin | `init_db()` automatico al arrancar |
+| Servidor de desarrollo | Apache / XAMPP / Laragon | `flask run` o `python app.py` |
 
 ---
 
-*Proyecto desarrollado en el marco de la asignatura Algoritmos y Logica de Programacion — Universidad Tecnica de Ambato, 2026.*
+*Proyecto Formativo Integrador — Universidad Tecnica de Ambato, 2026.*
